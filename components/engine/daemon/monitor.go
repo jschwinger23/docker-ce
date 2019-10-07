@@ -60,7 +60,7 @@ func (daemon *Daemon) ProcessEvent(id string, e libcontainerd.EventType, ei libc
 				logrus.WithError(err).Warnf("failed to delete container %s from containerd", c.ID)
 			}
 
-			logrus.Errorf("----> %s waiting for strean config: %v", id, c.StreanConfig)
+			logrus.Errorf("----> %s waiting for strean config: %v", id, c.StreamConfig)
 			c.StreamConfig.Wait()
 			logrus.Errorf("----> %s wait finished for strean config", id)
 			c.Reset(false)

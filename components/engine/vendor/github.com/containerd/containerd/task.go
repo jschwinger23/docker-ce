@@ -40,7 +40,7 @@ import (
 	"github.com/containerd/typeurl"
 	google_protobuf "github.com/gogo/protobuf/types"
 	digest "github.com/opencontainers/go-digest"
-	"github.com/opencontainers/image-spec/specs-go/v1"
+	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"github.com/pkg/errors"
 )
@@ -285,9 +285,13 @@ func (t *task) Delete(ctx context.Context, opts ...ProcessDeleteOpts) (*ExitStat
 	default:
 		return nil, errors.Wrapf(errdefs.ErrFailedPrecondition, "task must be stopped before deletion: %s", status.Status)
 	}
+	fmt.Println("----> handling t.io:", t.io)
 	if t.io != nil {
+		fmt.Println("----> canceling t.io:", t.io)
 		t.io.Cancel()
+		fmt.Println("----> waiting t.io: ", t.io)
 		t.io.Wait()
+		fmt.Println("----> finish waiting t.io:", t.io)
 	}
 	r, err := t.client.TaskService().Delete(ctx, &tasks.DeleteTaskRequest{
 		ContainerID: t.id,
