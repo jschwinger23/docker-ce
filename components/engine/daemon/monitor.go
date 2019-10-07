@@ -49,13 +49,19 @@ func (daemon *Daemon) ProcessEvent(id string, e libcontainerdtypes.EventType, ei
 		daemon.LogContainerEvent(c, "oom")
 	case libcontainerdtypes.EventExit:
 		if int(ei.Pid) == c.Pid {
+			defer logrus.Errorf("----> stopped: %s", id)
+			logrus.Errorf("----> recv exit msg for %s: %v", id, ei)
 			c.Lock()
+			logrus.Errorf("----> deleting task for %s", id)
 			_, _, err := daemon.containerd.DeleteTask(context.Background(), c.ID)
+			logrus.Errorf("----> deleted task for %s with err %v", id, err)
 			if err != nil {
 				logrus.WithError(err).Warnf("failed to delete container %s from containerd", c.ID)
 			}
 			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			logrus.Errorf("----> %s waiting for strean config: %v", id, c.StreanConfig)
 			c.StreamConfig.Wait(ctx)
+			logrus.Errorf("----> %s wait finished for strean config", id)
 			cancel()
 			c.Reset(false)
 
