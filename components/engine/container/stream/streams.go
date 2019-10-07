@@ -117,12 +117,14 @@ func (c *Config) CloseStreams() error {
 func (c *Config) CopyToPipe(iop *cio.DirectIO) {
 	copyFunc := func(w io.Writer, r io.ReadCloser) {
 		c.Add(1)
+		logrus.Errorf("----> stream config %v add 1: %v", c, w)
 		go func() {
 			if _, err := pools.Copy(w, r); err != nil {
 				logrus.Errorf("stream copy error: %v", err)
 			}
 			r.Close()
 			c.Done()
+			logrus.Errorf("----> stream config %v deduct 1: %v", c, w)
 		}()
 	}
 

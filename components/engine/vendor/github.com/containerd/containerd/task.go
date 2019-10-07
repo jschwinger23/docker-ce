@@ -34,6 +34,7 @@ import (
 	"github.com/containerd/containerd/diff"
 	"github.com/containerd/containerd/errdefs"
 	"github.com/containerd/containerd/images"
+	"github.com/containerd/containerd/log"
 	"github.com/containerd/containerd/mount"
 	"github.com/containerd/containerd/plugin"
 	"github.com/containerd/containerd/rootfs"
@@ -285,13 +286,13 @@ func (t *task) Delete(ctx context.Context, opts ...ProcessDeleteOpts) (*ExitStat
 	default:
 		return nil, errors.Wrapf(errdefs.ErrFailedPrecondition, "task must be stopped before deletion: %s", status.Status)
 	}
-	fmt.Println("----> handling t.io:", t.io)
+	log.L.Errorf("----> handling t.io: %v", t.io)
 	if t.io != nil {
-		fmt.Println("----> canceling t.io:", t.io)
+		log.L.Errorf("----> canceling t.io: %v", t.io)
 		t.io.Cancel()
-		fmt.Println("----> waiting t.io: ", t.io)
+		log.L.Errorf("----> waiting t.io: %v", t.io)
 		t.io.Wait()
-		fmt.Println("----> finish waiting t.io:", t.io)
+		log.L.Errorf("----> finish waiting t.io: %v", t.io)
 	}
 	r, err := t.client.TaskService().Delete(ctx, &tasks.DeleteTaskRequest{
 		ContainerID: t.id,
